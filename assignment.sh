@@ -50,6 +50,12 @@ sudo ip link set $VETHR2BR1 master $BR1
 sudo ip addr add 10.11.0.3/24 dev $BR0
 sudo ip addr add 10.12.0.3/24 dev $BR1
 
+# Assign IP addresses to the namespaces
+sudo ip netns exec $NS1 ip addr add 10.11.0.2/24 dev $VETHNS1
+sudo ip netns exec $NS2 ip addr add 10.12.0.2/24 dev $VETHNS2
+sudo ip netns exec $ROUTER ip addr add 10.11.0.1/24 dev $VETHR1
+sudo ip netns exec $ROUTER ip addr add 10.12.0.1/24 dev $VETHR2
+
 # Bring up the bridges and its interfaces
 sudo ip link set $BR0 up
 sudo ip link set $BR1 up
@@ -57,12 +63,6 @@ sudo ip link set $VETHNS1BR0 up
 sudo ip link set $VETHNS2BR1 up
 sudo ip link set $VETHR1BR0 up
 sudo ip link set $VETHR2BR1 up
-
-# Assign IP addresses to the namespaces
-sudo ip netns exec $NS1 ip addr add 10.11.0.2/24 dev $VETHNS1
-sudo ip netns exec $NS2 ip addr add 10.12.0.2/24 dev $VETHNS2
-sudo ip netns exec $ROUTER ip addr add 10.11.0.1/24 dev $VETHR1
-sudo ip netns exec $ROUTER ip addr add 10.12.0.1/24 dev $VETHR2
 
 # Bring up the veth interfaces inside namespaces
 sudo ip netns exec $NS1 ip link set $VETHNS1 up
@@ -78,11 +78,16 @@ sudo sysctl -p
 sudo ip netns exec $NS1 ip route add default via 10.11.0.1
 sudo ip netns exec $NS2 ip route add default via 10.12.0.1
 
-# Configure firewall rules for forwarding
+# Configure firewall rules for forwarding in the bridges
 sudo iptables --append FORWARD --in-interface $BR0 --jump ACCEPT
 sudo iptables --append FORWARD --out-interface $BR0 --jump ACCEPT
 sudo iptables --append FORWARD --in-interface $BR1 --jump ACCEPT
 sudo iptables --append FORWARD --out-interface $BR1 --jump ACCEPT
+
+# Configure firewall rules for forwarding in the router
+sudo iptables -A FORWARD -i vethr1 -o vethr2 -j ACCEPT
+sudo iptables -A FORWARD -i vethr2 -o vethr1 -j ACCEPT
+
 
 # Enable NAT
 sudo iptables -t nat -A POSTROUTING -o $BR0 -j MASQUERADE

@@ -22,20 +22,20 @@ VETHR2BR1=vethr2-br1
 
 # Cleanup function
 cleanup() {
-    ip netns del $NS1 || true
-    ip netns del $NS2 || true
-    ip netns del $ROUTER || true
-    ip link del $BR0 || true
-    ip link del $BR1 || true
-    ip link del $VETHNS1 || true
-    ip link del $VETHNS1BR0 || true
-    ip link del $VETHNS2 || true
-    ip link del $VETHNS2BR1 || true
-    ip link del $VETHR1 || true
-    ip link del $VETHR1BR0 || true
-    ip link del $VETHR2 || true
-    ip link del $VETHR2BR1 || true
-    echo "Cleanup complete."
+    sudo ip netns del $NS1 || true
+    sudo ip netns del $NS2 || true
+    sudo ip netns del $ROUTER || true
+    sudo ip link del $BR0 || true
+    sudo ip link del $BR1 || true
+    sudo ip link del $VETHNS1 || true
+    sudo ip link del $VETHNS1BR0 || true
+    sudo ip link del $VETHNS2 || true
+    sudo ip link del $VETHNS2BR1 || true
+    sudo ip link del $VETHR1 || true
+    sudo ip link del $VETHR1BR0 || true
+    sudo ip link del $VETHR2 || true
+    sudo ip link del $VETHR2BR1 || true
+    sudo echo "Cleanup complete."
 }
 
 
